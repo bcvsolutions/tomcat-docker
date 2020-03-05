@@ -1,0 +1,16 @@
+# Example compose file for Apache Tomcat
+
+version: '3'
+
+services:
+  appserver:
+    image: bcv-tomcat:8.5.50-r0
+    container_name: appserver
+    ports:
+      - 8009:8009
+      - 8080:8080
+    hostname: appserver
+    environment:
+      - JAVA_XMS=768M
+      - JAVA_XMX=1536M
+      - TZ=Europe/Prague

@@ -1,0 +1,3 @@
+The Tomcat STDOUT AccessLog valve library is cloned from:
+https://github.com/Scout24/tomcat-stdout-accesslog
+and built using its pom.xml. No changes to this library were made.
