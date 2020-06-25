@@ -1,5 +1,5 @@
 # Tomcat image
-Image built atop centos:7 with Apache Tomcat 8.5.x version. It has no mountable dependencies.
+Image built atop centos:7 with Apache Tomcat 8.5.x version. It has mountable dependencies that are only optional.
 This image is a baseimage for our [CzechIdM identity manager container](https://github.com/bcvsolutions/czechidm-docker).
 
 ## Image versioning
@@ -18,7 +18,7 @@ bcv-tomcat:8.5.50-r0    // first release of Apache Tomcat 8.5.50 image
 ```
 
 ## Building
-Simply cd to the directory which contains the Dockerfile and issue `docker build -t bcv-tomcat ./`.
+Simply cd to the directory which contains the Dockerfile and issue `docker build -t <image tag here> ./`.
 
 The build process:
 1. Pulls **centos:7** image.
@@ -32,7 +32,7 @@ No security hardening is performed.
 ## Use
 Image can be used without further configuration because it contains some defaults.
 - Deploy directory is **/opt/tomcat/current/webapps**.
-- Default Tomcat network ports (8009,8080), no HTTPS configured.
+- Default Tomcat network ports (8080), no HTTPS configured.
 - STDOUT/STDERR logging, logs available with `docker logs CONTAINER`.
 - Xms512M
 - Xmx1024M
@@ -83,12 +83,28 @@ You can pass a number of environment variables into the container.
 - **STARTTOMCAT_BREAKPOINT** - When set (even to empty string), causes **run.sh** to sleep for 3600s so you can exec into the container and look around.
 - **TZ** - Upon every start of the container, the current timezone is checked and set (TZ variable and /etc/localtime symlink). Set the timezone to suit your needs, syntax is [IANA tzdata](https://www.iana.org/time-zones) (the same you know from Linux). **Default: UTC**.
 - **DOCKER_TOMCAT_ENABLE_FILE_LOGGING** - By default, there are file loggers defined in the Tomcat's logging.properties file, making Tomcat to log into container's filesystem. We get rid of it upon the **first start** of the container and redirect all logging to STDOUT/STDERR. If you want file-based logs to be written, set this variable (value does not matter). **Default: disabled**.
+- **DOCKER_TOMCAT_ENABLE_AJP** - On newer Tomcat versions, the AJP port is disabled by default. If this property is set (even if empty), Tomcat will be configured to use AJP port. **Default: disabled**.
+- **DOCKER_TOMCAT_AJP_PASSFILE** - Path to a file with AJP port password. If not set, the AJP port will be configured as `requireSecret=false`. **Default: not set**.
 - **JAVA_XMS** - Java Xms parameter. **Default: 512M**.
 - **JAVA_XMX** - Java Xmx parameter. **Default: 1024M**.
 - **CATALINA_OPTS_ADD** - What should be appended to CATALINA_OPTS variable. Default CATALINA_OPTS is `-Xms${JAVA_XMS} -Xmx${JAVA_XMX} -server -XX:+UseParallelGC`.
 - **JAVA_OPTS_ADD** - What should be appended to JAVA_OPTS variable. Default JAVA_OPTS is `-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom -Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true -Djavax.servlet.request.encoding=UTF-8`.
 - **CATALINA_OPTS_OVR** - If set, completely replaces contents of CATALINA_OPTS. Setting this variable to an empty string effectively removes any CATALINA_OPTS.
 - **JAVA_OPTS_OVR** - If set, completely replaces contents of JAVA_OPTS. Setting this variable to an empty string effectively removes any JAVA_OPTS.
+
+## Mounted files and volumes
+- Optional
+  - AJP port password file
+    - This password protects Tomcat's AJP port.
+    - Without this file mounted, the AJP port will be configured to not require password (any unauthenticated client can access it).
+    - Example
+      ```yaml
+      volumes:
+        - type: bind
+          source: ./tomcat_ajp.pwfile
+          target: /run/secrets/ajp.pwfile
+          read_only: true
+      ```
 
 ## Forbidden variables
 - **RUNSCRIPTS_PATH** - Defined in the Dockerfile and used during both build of the image and life of the container. This is a root folder from which the startup scripts locate each other. If you change it, the container start process will go haywire. For safety reasons, this variable is set as `readonly` in the **run.sh**.
