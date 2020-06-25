@@ -16,8 +16,19 @@ if [ -z "${DOCKER_TOMCAT_ENABLE_FILE_LOGGING+x}" ]; then
      -d "//Valve[@className = 'org.apache.catalina.valves.AccessLogValve']/@directory" \
      -d "//Valve[@className = 'org.apache.catalina.valves.AccessLogValve']/@prefix" \
      -d "//Valve[@className = 'org.apache.catalina.valves.AccessLogValve']/@suffix" \
-     -u "//Valve[@className = 'org.apache.catalina.valves.AccessLogValve']/@className" -v "de.is24.tomcat.StdoutAccessLogValve" \
-     server.xml
+     server.xml;
+
+  if [ -z "${DOCKER_TOMCAT_DISABLE_ACCESS_LOG+x}" ]; then
+    #the variable is not set, so we will enable access logging
+    xmlstarlet ed -L \
+      -u "//Valve[@className = 'org.apache.catalina.valves.AccessLogValve']/@className" -v "de.is24.tomcat.StdoutAccessLogValve" \
+     server.xml;
+  else
+    #variable is set, so we sill get rid of access log altogether
+    xmlstarlet ed -L \
+      -d "//Valve[@className = 'org.apache.catalina.valves.AccessLogValve']" \
+     server.xml;
+  fi
 
   echo "[$0] Tomcat now logging only on STDOUT/STDERR.";
 else

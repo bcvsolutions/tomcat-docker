@@ -83,6 +83,7 @@ You can pass a number of environment variables into the container.
 - **STARTTOMCAT_BREAKPOINT** - When set (even to empty string), causes **run.sh** to sleep for 3600s so you can exec into the container and look around.
 - **TZ** - Upon every start of the container, the current timezone is checked and set (TZ variable and /etc/localtime symlink). Set the timezone to suit your needs, syntax is [IANA tzdata](https://www.iana.org/time-zones) (the same you know from Linux). **Default: UTC**.
 - **DOCKER_TOMCAT_ENABLE_FILE_LOGGING** - By default, there are file loggers defined in the Tomcat's logging.properties file, making Tomcat to log into container's filesystem. We get rid of it upon the **first start** of the container and redirect all logging to STDOUT/STDERR. If you want file-based logs to be written, set this variable (value does not matter). **Default: disabled**.
+- **DOCKER_TOMCAT_DISABLE_ACCESS_LOG** - If this variable is set (even if empty), the Tomcat's access log is completely silenced. The application log is not affected by this setting. This option has no effect if Tomcat's file logging is enabled. **Default: disabled**.
 - **DOCKER_TOMCAT_ENABLE_AJP** - On newer Tomcat versions, the AJP port is disabled by default. If this property is set (even if empty), Tomcat will be configured to use AJP port. **Default: disabled**.
 - **DOCKER_TOMCAT_AJP_PASSFILE** - Path to a file with AJP port password. If not set, the AJP port will be configured as `requireSecret=false`. **Default: not set**.
 - **JAVA_XMS** - Java Xms parameter. **Default: 512M**.
