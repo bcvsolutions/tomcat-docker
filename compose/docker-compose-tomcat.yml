@@ -4,7 +4,7 @@ version: '3.2'
 
 services:
   appserver:
-    image: bcv-tomcat:8.5.56-r0
+    image: bcv-tomcat:8.5.60-r0
     container_name: appserver
     ports:
       - 8009:8009
