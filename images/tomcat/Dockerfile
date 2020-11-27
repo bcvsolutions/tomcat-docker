@@ -1,14 +1,14 @@
 FROM centos:7
 
 ENV TOMCAT_MAJOR 8
-ENV TOMCAT_VERSION 8.5.56
+ENV TOMCAT_VERSION 8.5.60
 
 ENV RUNSCRIPTS_PATH /runscripts
 
 RUN yum install -y epel-release && \
 		yum install -y deltarpm && \
 		yum update -y && \
-		yum install -y wget psmisc sudo java-1.8.0-openjdk-headless java-1.8.0-openjdk-devel xmlstarlet && \
+		yum install -y wget psmisc sudo java-11-openjdk-headless java-11-openjdk-devel xmlstarlet && \
 		yum clean all
 
 # The ddist() function is copied from

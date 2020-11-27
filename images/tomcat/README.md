@@ -18,7 +18,7 @@ bcv-tomcat:8.5.50-r0    // first release of Apache Tomcat 8.5.50 image
 ```
 
 ## Building
-Simply cd to the directory which contains the Dockerfile and issue `docker build -t <image tag here> ./`.
+Simply cd to the directory which contains the Dockerfile and issue `docker build --no-cache -t <image tag here> ./`.
 
 The build process:
 1. Pulls **centos:7** image.
