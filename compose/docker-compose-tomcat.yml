@@ -22,3 +22,7 @@ services:
 #        source: ./tomcat_ajp.pwfile
 #        target: /run/secrets/ajp.pwfile
 #        read_only: true
+#      - type: bind
+#        source: ./certs
+#        target: /opt/tomcat/truststore/certs
+#        read_only: true
