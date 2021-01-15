@@ -1,14 +1,15 @@
 FROM centos:7
 
-ENV TOMCAT_MAJOR 8
-ENV TOMCAT_VERSION 8.5.60
+ENV TOMCAT_MAJOR 9
+ENV TOMCAT_VERSION 9.0.41
 
 ENV RUNSCRIPTS_PATH /runscripts
+ENV TOMCAT_TRUSTSTORE /opt/tomcat/truststore
 
 RUN yum install -y epel-release && \
 		yum install -y deltarpm && \
 		yum update -y && \
-		yum install -y wget psmisc sudo java-11-openjdk-headless java-11-openjdk-devel xmlstarlet && \
+		yum install -y wget psmisc sudo java-11-openjdk-headless java-11-openjdk-devel xmlstarlet openssl && \
 		yum clean all
 
 # The ddist() function is copied from
@@ -55,7 +56,8 @@ RUN groupadd -r -g 998 tomcat && \
 		chmod g+r conf/* && \
 		chown -R tomcat webapps/ work/ temp/ logs/ && \
 		\
-		mkdir -pv "$RUNSCRIPTS_PATH"
+		mkdir -pv "$RUNSCRIPTS_PATH" \
+		mkdir -pv "$TOMCAT_TRUSTSTORE/certs"
 
 COPY runscripts "$RUNSCRIPTS_PATH/"
 RUN find "$RUNSCRIPTS_PATH/" -name "*.sh" -exec chmod -v u+x {} \;

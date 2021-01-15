@@ -1,5 +1,5 @@
 # Tomcat image
-Image built atop centos:7 with Apache Tomcat 8.5.x version. It has mountable dependencies that are only optional.
+Image built atop centos:7 with Apache Tomcat 9.0.x version. It has mountable dependencies that are only optional.
 This image is a baseimage for our [CzechIdM identity manager container](https://github.com/bcvsolutions/czechidm-docker).
 
 ## Image versioning
@@ -23,8 +23,8 @@ Simply cd to the directory which contains the Dockerfile and issue `docker build
 The build process:
 1. Pulls **centos:7** image.
 1. Updates binaries inside the image.
-1. Installs JDK 1.8 (headless) and necessary tooling.
-1. Downloads and sets up Tomcat 8.5.50 (for actual version, see top of the Dockerfile) to run under separate user **tomcat**.
+1. Installs JDK 11 (headless) and necessary tooling.
+1. Downloads and sets up Apache Tomcat (for actual version, see top of the Dockerfile) to run under separate user **tomcat**.
 1. Creates startup scripts structure inside **/runscripts** folder in the image. If you want to add your scripts to the runscripts, simply place them between sources and run the build process.
 
 No security hardening is performed.
@@ -106,9 +106,21 @@ You can pass a number of environment variables into the container.
           target: /run/secrets/ajp.pwfile
           read_only: true
       ```
+  - Trusted certificates directory
+    - This directory contains certificates, that the Tomcat will trust. All certificates here **must** be in PEM format, their files names **without** spaces or special characters (`-` can be used).
+    - Without this directory mounted, Tomcat will not trust any SSL certificate.
+    - Example
+      ```yaml
+      volumes:
+        - type: bind
+          source: ./certs
+          target: /opt/tomcat/truststore/certs
+          read_only: true
+      ```
 
 ## Forbidden variables
 - **RUNSCRIPTS_PATH** - Defined in the Dockerfile and used during both build of the image and life of the container. This is a root folder from which the startup scripts locate each other. If you change it, the container start process will go haywire. For safety reasons, this variable is set as `readonly` in the **run.sh**.
+- **TOMCAT_TRUSTSTORE** - Defined in the Dockerfile, this variable points to the directory where all trusted certificates magic happens. See runscript 000_002-generateJavaTruststore.sh for details.
 
 ## Hacking away
 Once the container is created, there is no way to change its environment variables. This may get a bit clunky if you want to change some simple setting or when there is undesirable to destroy the container because of proper reconfiguration.
