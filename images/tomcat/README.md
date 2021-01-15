@@ -63,6 +63,14 @@ Bootup process of the container:
 
 All sh scripts run as **root** user, Tomcat runs as a **tomcat** user.
 
+Tomcat image adds its own scripts there too:
+- **runEvery.d/000_001-updateTimezone.sh** - This script updates container timezone according to the value in **TZ** variable, see the variable doc for details.
+- **runEvery.d/000_002-generateJavaTruststore.sh** - This script generates (if not exists) and updates Tomcat Java truststore. It compares contents of `/opt/tomcat/truststore/certs/` directory with current truststore and updates the truststore accordingly - by removing obsolete and adding new certificates.
+  - Certificates in the truststore are aliased by their backing file name. For example, certificate with alias `ad-ca.pem` is considered to have backing file `/opt/tomcat/truststore/certs/ad-ca.pem`. This comparison is done by name, so if you simply refresh the ad-ca.pem storing new certificate in there, the truststore **will not be updated**.
+  - All certificates have to be in PEM format.
+  - Resulting truststore is `/opt/tomcat/truststore/truststore.jks`.
+  - Script generates (on-the-fly) new environment-adjusting file for the Tomcat, passing there truststore path and truststore password. This file is named `/runscripts/startTomcat.d/000_002-TomcatTruststoreOpts.sh`.
+
 ## Container shutdown
 When initialized and running, the process tree in container looks like this:
 ```
